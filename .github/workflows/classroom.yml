@@ -34,13 +34,21 @@ jobs:
             exit 1
           fi
 
-      - name: Curl check
+      - name: Curl and content check
         run: |
           STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$URL")
           echo "HTTP Status: $STATUS"
 
           if [ "$STATUS" -ne 200 ]; then
             echo "Deployment not reachable (status $STATUS)"
+            exit 1
+          fi
+
+          echo "Checking page content..."
+          curl -s "$URL" | grep -q "CSC309"
+
+          if [ $? -ne 0 ]; then
+            echo "Expected content 'CSC309' not found"
             exit 1
           fi
 
